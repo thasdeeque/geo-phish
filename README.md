@@ -1,6 +1,4 @@
-# geo-phish
-**GeoSpy** is a phishing tool disguised as a survey or prayer compass. Attackers generate a public link and trick victims into visiting. It secretly collects GPS location, device details, IP address, battery status, and survey answers. Data is sent to the attacker’s ser[README.md](https://github.com/user-attachments/files/26217180/README.md)
-ver# 📍 LocationPhish — GPS Location Tracker Awareness Demo
+# 📍 LocationPhish — GPS Location Tracker Awareness Demo
 
 > Demonstrates how attackers trick users into sharing their GPS location through fake survey pages.
 
@@ -54,4 +52,3 @@ locationphish/
 ## Disclaimer
 
 For **educational awareness only**. Unauthorized use is illegal.
- and logged. Victims unknowingly expose sensitive personal information.
